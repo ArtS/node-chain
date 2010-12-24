@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var c = require('./index').runChain,
+var c = require('./index'),
     chain,
     test_args,
     test_stack,
@@ -40,7 +40,7 @@ function assertArraysEqual(a, b) {
 //
 
 chain = [];
-c(chain);
+c.runChain(chain);
 
 //
 // 2. Test that all chained functions getting called in the proper order
@@ -68,7 +68,7 @@ chain = [
     }
 ];
 
-c(chain);
+c.runChain(chain);
 
 assertArraysEqual(chain[0].args, test_args[0]);
 assertArraysEqual(chain[1].args, test_args[1]);
@@ -110,7 +110,7 @@ chain = [
     }
 ];
 
-c(chain);
+c.runChain(chain);
 
 assertEquals(test_args.length, 2);
 assertArraysEqual(chain[0].args, test_args[0]);
@@ -118,3 +118,48 @@ assertArraysEqual(chain[1].args, test_args[1]);
 assertArraysEqual(test_stack, [1, 2]);
 assertEquals(ERROR_MESSAGE, test_error);
 
+//
+// 4. Test that default error handler is called
+//
+test_args = [];
+test_stack = [];
+test_error = '';
+
+c.defaultErrorHandler = function(err) {
+    test_error = err;
+}
+
+chain = [
+    {
+        target: function(a, b, c, callback) {
+            test_args.push([a, b, c]);
+            test_stack.push(1);
+            callback(null);
+        },
+        args: [1, 2, 3]
+    },
+    {
+        target: function(a, b, c, callback) {
+            test_args.push([a, b, c]);
+            test_stack.push(2);
+            callback(ERROR_MESSAGE);
+        },
+        args: [4, 5, 6]
+    },
+    {
+        target: function(a, b, c, callback) {
+            test_args.push([a, b, c]);
+            test_stack.push(3);
+            callback(null);
+        },
+        args: [7, 8, 9]
+    }
+];
+
+c.runChain(chain);
+
+assertEquals(test_args.length, 2);
+assertArraysEqual(chain[0].args, test_args[0]);
+assertArraysEqual(chain[1].args, test_args[1]);
+assertArraysEqual(test_stack, [1, 2]);
+assertEquals(ERROR_MESSAGE, test_error);

@@ -1,13 +1,15 @@
 var util = require('util');
 
 
+function defaultErrorHandler(err) {
+    util.log(err);
+}
+
 function runChain(chain, index) {
     var chainIndex = index || 0,
         currRing,
         currArgs = [],
         argIndex = 0;
-
-    debugger;
 
     if (!chain || chain.length === 0) {
         return;
@@ -27,9 +29,8 @@ function runChain(chain, index) {
         if (err) {
             // If error handler callback is provided, call it supplying 'err' object,
             // otherwise just output the errorMessage
-            handler = currRing.errorHandler || util.log;
-            msg = currRing.errorHandler ? err : currRing.errorMessage;
-            handler(msg);
+            handler = currRing.errorHandler || exports.defaultErrorHandler;
+            handler(err);
             return;
         }
 
@@ -50,3 +51,4 @@ function runChain(chain, index) {
 
 
 exports.runChain = runChain;
+exports.defaultErrorHandler = defaultErrorHandler;
