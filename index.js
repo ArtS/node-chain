@@ -7,7 +7,7 @@ function defaultErrorHandler(err) {
 
 function runChain(chain, index) {
     var chainIndex = index || 0,
-        currRing,
+        currentElem,
         currArgs = [],
         argIndex = 0;
 
@@ -19,7 +19,7 @@ function runChain(chain, index) {
         return;
     }
 
-    currRing = chain[chainIndex];
+    currentElem = chain[chainIndex];
 
     function checkErrorCallback(err) {
 
@@ -28,8 +28,8 @@ function runChain(chain, index) {
 
         if (err) {
             // If error handler callback is provided, call it supplying 'err' object,
-            // otherwise just output the errorMessage
-            handler = currRing.errorHandler || exports.defaultErrorHandler;
+            // otherwise call the default handler
+            handler = currentElem.errorHandler || exports.defaultErrorHandler;
             handler(err);
             return;
         }
@@ -38,15 +38,16 @@ function runChain(chain, index) {
         runChain(chain, chainIndex);
     }
 
-    if (currRing.args) {
-        for (; argIndex < currRing.args.length; argIndex++) {
-            currArgs.push(currRing.args[argIndex]);
+    // Add pre-defined arguments
+    if (currentElem.args) {
+        for (; argIndex < currentElem.args.length; argIndex++) {
+            currArgs.push(currentElem.args[argIndex]);
         }
     }
 
     currArgs.push(checkErrorCallback);
 
-    currRing.target.apply(this, currArgs);
+    currentElem.target.apply(this, currArgs);
 }
 
 
