@@ -26,5 +26,26 @@ Consider the following code:
         }
     );
 
+Here we just copied a file from one place to another, and yet we already have three levels of folding.
 
-This library is perhaps a naive attempt to solve the problem of callback chaining.
+Node-chain is perhaps a naive attempt to solve this problem.
+
+Consider the solution:
+
+
+    var fs = require('fs'),
+        runChain = require('node-chain').runChain,
+        chain = [
+            {
+                target: fs.readFile,
+                args: ['/etc/passwd'],
+                errorHandler: handleError,
+                passResultToNextStep: true
+            },
+            {
+                target: fs.writeFile,
+                errorMessage: 'Unable to write the file'
+            }
+        ];
+
+    runChain(chain);
