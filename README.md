@@ -1,7 +1,9 @@
 ## Description
 
-This library is perhaps a naive attempt to solve the problem of callback chaining.
+As you probably have noticed during your node.js develeopment, it is really easy to get deep into callback mess.
+
 Consider the following code:
+
 
     var fs = require('fs');
 
@@ -23,3 +25,6 @@ Consider the following code:
             );
         }
     );
+
+
+This library is perhaps a naive attempt to solve the problem of callback chaining.
