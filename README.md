@@ -1,6 +1,6 @@
 ## Description
 
-This library is perhaps naive attempt to solve the problem of callback chaining.
+This library is perhaps a naive attempt to solve the problem of callback chaining.
 Consider the following code:
 
     var fs = require('fs');
