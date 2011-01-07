@@ -8,8 +8,8 @@ function defaultErrorHandler(err) {
 function runChain(chain, index) {
     var chainIndex = index || 0,
         currentElem,
-        currArgs = [],
-        argIndex = 0;
+        argIndex = 0,
+        currentArgs = [];
 
     if (!chain || chain.length === 0) {
         return;
@@ -24,7 +24,10 @@ function runChain(chain, index) {
     function checkErrorCallback(err) {
 
         var handler,
-            msg;
+            msg,
+            args,
+            resultArgs,
+            i = 0;
 
         if (err) {
             // If error handler callback is provided, call it supplying 'err' object,
@@ -35,19 +38,35 @@ function runChain(chain, index) {
         }
 
         chainIndex += 1;
-        runChain(chain, chainIndex);
+        debugger;
+        args = [chain, chainIndex];
+
+        // If passResultToNextStep was specified, need to pass result of previous callback
+        // to next function in chain, skipping the 'err' object
+        if (currentElem.passResultToNextStep) {
+            resultArgs = Array.prototype.splice.apply(arguments, [1, arguments.length-1]);
+            for (; i < resultArgs.length; i++) {
+                args.push(resultArgs[i]);
+            }
+        }
+
+        runChain.apply(null, args);
     }
 
-    // Add pre-defined arguments
-    if (currentElem.args) {
-        for (; argIndex < currentElem.args.length; argIndex++) {
-            currArgs.push(currentElem.args[argIndex]);
+    if (arguments.length > 2) {
+        // Looks like we were supplied agruments from previous call.
+        // Let's take away 'chain' and 'chainIndex' arguments and pass it on further
+        // down the call chain
+        currentArgs = Array.prototype.splice.apply(arguments, [2, arguments.length-2]);
+    } else {
+        // No arguments from prevous call, just use pre-defined arguments, if any
+        if (currentElem.args) {
+            currentArgs = currentElem.args.slice();
         }
     }
 
-    currArgs.push(checkErrorCallback);
-
-    currentElem.target.apply(this, currArgs);
+    currentArgs.push(checkErrorCallback);
+    currentElem.target.apply(this, currentArgs);
 }
 
 

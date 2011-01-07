@@ -150,7 +150,7 @@ chain = [
         target: function(a, b, c, callback) {
             test_args.push([a, b, c]);
             test_stack.push(3);
-            callback(null);
+            callback(null, a, b, c);
         },
         args: [7, 8, 9]
     }
@@ -163,3 +163,32 @@ assertArraysEqual(chain[0].args, test_args[0]);
 assertArraysEqual(chain[1].args, test_args[1]);
 assertArraysEqual(test_stack, [1, 2]);
 assertEquals(ERROR_MESSAGE, test_error);
+
+
+//
+// 5. Test passing of callback results to the next function inthe chain
+//
+test_stack = [];
+test_args = [];
+
+chain = [
+    {
+        target: function(callback) {
+            test_stack.push(1);
+            callback(null, 1, 2, 3);
+        },
+        passResultToNextStep: true
+    },
+    {
+        target: function(a, b, c) {
+            test_stack.push(2);
+            test_args.push([a, b, c]);
+            //callback(null);
+        }
+    }
+];
+
+c.runChain(chain);
+
+assertArraysEqual(test_stack, [1, 2]);
+assertArraysEqual(test_args[0], [1, 2, 3]);
