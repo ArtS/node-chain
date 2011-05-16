@@ -1,6 +1,6 @@
 ## Problem
 
-As you probably have noticed during your node.js develeopment, it is really easy to get deep into callback mess.
+As you probably have noticed during your node.js development, it is really easy to get deep into callback mess.
 Consider the following code:
 
     var fs = require('fs');
