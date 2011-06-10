@@ -38,7 +38,6 @@ function runChain(chain, index) {
         }
 
         chainIndex += 1;
-        debugger;
         args = [chain, chainIndex];
 
         // If passResultToNextStep was specified, need to pass result of previous callback
